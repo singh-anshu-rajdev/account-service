@@ -35,16 +35,12 @@ public class AccountOwnershipAspect {
                                        VerifyAccountOwnership verifyAccountOwnership) throws Exception {
 
         Long accountId = extractAccountId(joinPoint, verifyAccountOwnership.field());
-
         CacheDTO cacheDTO = jwtUtils.getCacheDTOFromToken(getToken());
-
         if (accountId == null || cacheDTO == null) {
             throw new RuntimeException("Account ID not found in request");
         }
-
         boolean exists = accountDetailsRepository
                 .existsByIdAndUserIdAndDeletedFlagFalse(accountId, cacheDTO.getUserId());
-
         if (!exists) {
             throw new RuntimeException("Unauthorized access to account");
         }
@@ -53,13 +49,10 @@ public class AccountOwnershipAspect {
     private Long extractAccountId(JoinPoint joinPoint, String fieldName) throws Exception {
 
         Object[] args = joinPoint.getArgs();
-
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         Method method = signature.getMethod();
         Parameter[] parameters = method.getParameters();
-
         for (int i = 0; i < parameters.length; i++) {
-
             Parameter parameter = parameters[i];
             Object arg = args[i];
 
@@ -80,12 +73,11 @@ public class AccountOwnershipAspect {
                 Field field = arg.getClass().getDeclaredField(fieldName);
                 field.setAccessible(true);
                 Object value = field.get(arg);
-
                 if (value instanceof Long) {
                     return (Long) value;
                 }
-
             } catch (NoSuchFieldException ignored) {
+                // If the field is not found in this parameter, continue to the next one
             }
         }
 
