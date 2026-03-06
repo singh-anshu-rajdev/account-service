@@ -1,0 +1,150 @@
+-- ============================================================================
+-- MySQL Database Script for SmartBankLite Account Service
+-- Creates Address and Account tables with proper relationships
+-- ============================================================================
+
+-- ============================================================================
+-- 1. CREATE ADDRESS TABLE
+-- ============================================================================
+CREATE TABLE IF NOT EXISTS address (
+
+    -- Primary Key
+    id BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT 'Unique address identifier',
+
+    -- Address Fields
+    street_address VARCHAR(255) NOT NULL COMMENT 'Street address',
+    city VARCHAR(100) NOT NULL COMMENT 'City name',
+    state VARCHAR(100) NOT NULL COMMENT 'State or province',
+    zip_code VARCHAR(20) NOT NULL COMMENT 'Postal or ZIP code',
+    country VARCHAR(100) NOT NULL COMMENT 'Country name',
+
+    -- Audit Fields
+    deleted_flag BOOLEAN DEFAULT FALSE COMMENT 'Soft delete flag',
+    created_by VARCHAR(100) COMMENT 'User who created the record',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT 'Record creation timestamp',
+    updated_by VARCHAR(100) COMMENT 'User who last updated the record',
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Record last update timestamp',
+
+    -- Indexes
+    INDEX idx_city (city),
+    INDEX idx_state (state),
+    INDEX idx_zip_code (zip_code),
+    INDEX idx_deleted_flag (deleted_flag)
+
+) ENGINE=InnoDB
+DEFAULT CHARSET=utf8mb4
+COLLATE=utf8mb4_unicode_ci
+COMMENT='Stores address details for SmartBankElite accounts';
+
+-- ============================================================================
+-- 2. CREATE ACCOUNT TABLE
+-- ============================================================================
+CREATE TABLE IF NOT EXISTS account_details (
+
+    -- Primary Key
+    id BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT 'Unique account identifier',
+
+    -- Personal Information
+    first_name VARCHAR(100) NOT NULL COMMENT 'First name of account holder',
+    last_name VARCHAR(100) NOT NULL COMMENT 'Last name of account holder',
+    date_of_birth DATE COMMENT 'Date of birth (YYYY-MM-DD format)',
+    gender VARCHAR(20) COMMENT 'Gender (Male, Female, Other)',
+    nationality VARCHAR(100) COMMENT 'Nationality/Country of origin',
+
+    -- Contact Information
+    email VARCHAR(255) NOT NULL COMMENT 'Email address (unique identifier)',
+    mobile_number VARCHAR(20) NOT NULL COMMENT 'Mobile phone number for contact',
+
+    -- Account Details
+    unique_id VARCHAR(255) NOT NULL COMMENT 'Business account identifier',
+    account_type VARCHAR(50) NOT NULL COMMENT 'Type of account (Savings, Current, etc)',
+    initial_deposit DECIMAL(15,2) NOT NULL COMMENT 'Initial deposit amount',
+
+    -- Consent & Preferences
+    terms_accepted BOOLEAN NOT NULL COMMENT 'Whether user accepted terms and conditions',
+    marketing_consent BOOLEAN COMMENT 'Opt-in for marketing communications',
+
+    -- Foreign Key to Address
+    address_id BIGINT COMMENT 'Reference to address table',
+
+    -- Audit Fields
+    deleted_flag BOOLEAN DEFAULT FALSE COMMENT 'Soft delete flag (FALSE = active)',
+    created_by VARCHAR(100) COMMENT 'User who created the record',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT 'Record creation timestamp',
+    updated_by VARCHAR(100) COMMENT 'User who last updated the record',
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Record last update timestamp',
+
+    -- Foreign Key Constraint
+    CONSTRAINT fk_account_address
+        FOREIGN KEY (address_id) REFERENCES address(id)
+        ON DELETE CASCADE,
+
+    -- Indexes
+    INDEX idx_mobile_number (mobile_number),
+    INDEX idx_created_at (created_at),
+    INDEX idx_deleted_flag (deleted_flag),
+    INDEX idx_address_id (address_id)
+
+) ENGINE=InnoDB
+DEFAULT CHARSET=utf8mb4
+COLLATE=utf8mb4_unicode_ci
+COMMENT='Stores account information for SmartBankElite users';
+
+ALTER TABLE account_details AUTO_INCREMENT = 100000000000001;
+
+ALTER TABLE accountdb.account_details
+ADD COLUMN user_id VARCHAR(255) NOT NULL;
+
+-- ============================================================================
+-- 3. SAMPLE INSERT STATEMENTS (for testing)
+-- ============================================================================
+
+-- Insert a sample address
+INSERT INTO address (street_address, city, state, zip_code, country)
+VALUES ('123 Main Street', 'New York', 'NY', '10001', 'USA');
+
+-- Insert a sample account (Note: ID must be >= 100000000000001 as per sequence)
+INSERT INTO account_details (
+    id, first_name, last_name, date_of_birth, gender, nationality,
+    email, mobile_number, unique_id, account_type, initial_deposit,
+    password, terms_accepted, marketing_consent, address_id,
+    deleted_flag, created_by
+) VALUES (
+    100000000000001,
+    'John',
+    'Doe',
+    '1990-05-15',
+    'Male',
+    'American',
+    'john.doe@example.com',
+    '+1-555-0123',
+    'ACC001',
+    'Savings',
+    5000.00,
+    '$2a$10$encrypted_password_hash_here',
+    TRUE,
+    TRUE,
+    1,
+    FALSE,
+    'ADMIN'
+);
+
+-- ============================================================================
+-- 4. VERIFICATION QUERIES
+-- ============================================================================
+
+-- Check tables created
+-- SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'your_database_name';
+
+-- View account details
+-- SELECT * FROM account_details;
+
+-- View address details
+-- SELECT * FROM address;
+
+-- Join query to view account with address
+-- SELECT
+--     a.id, a.first_name, a.last_name, a.email,
+--     ad.street_address, ad.city, ad.state, ad.zip_code, ad.country
+-- FROM account_details a
+-- LEFT JOIN address ad ON a.address_id = ad.id;

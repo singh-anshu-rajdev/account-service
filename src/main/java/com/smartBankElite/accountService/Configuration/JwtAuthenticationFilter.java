@@ -23,6 +23,8 @@ import java.util.ArrayList;
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
+    private static InheritableThreadLocal<String> tokenContext = new InheritableThreadLocal<>();
+
     @Autowired
     private HandlerExceptionResolver handlerExceptionResolver;
 
@@ -31,6 +33,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Autowired
     private UserDetailsService userDetailsService;
+
+    public static String getToken() {
+        return tokenContext.get();
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -54,6 +60,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }else{
                 throw new RuntimeException("JWT Token is missing or does not start with Bearer ");
             }
+
+            tokenContext.set(jwt);
 
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = new User(username, "", new ArrayList<>());
