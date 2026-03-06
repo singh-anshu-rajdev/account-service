@@ -8,10 +8,6 @@ import java.util.UUID;
 @Slf4j
 public class CredentialGenerator {
 
-    private static final String PASSWORD_CHARS =
-            "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$!";
-
-    private static final String USERNAME_CHARS = "0123456789@#$!";
     private static final SecureRandom random = new SecureRandom();
 
     // Generate username
@@ -21,7 +17,8 @@ public class CredentialGenerator {
         StringBuilder suffix = new StringBuilder();
 
         for (int i = 0; i < 3; i++) {
-            suffix.append(USERNAME_CHARS.charAt(random.nextInt(USERNAME_CHARS.length())));
+            suffix.append(SmartBankEliteConstants.USERNAME_CHARS.toString()
+                    .charAt(random.nextInt(SmartBankEliteConstants.USERNAME_CHARS.toString().length())));
         }
 
         return base + suffix;
@@ -32,8 +29,10 @@ public class CredentialGenerator {
 
         StringBuilder password = new StringBuilder();
         for (int i = 0; i < 10; i++) {
-            password.append(PASSWORD_CHARS.charAt(random.nextInt(PASSWORD_CHARS.length())));
+            password.append(SmartBankEliteConstants.PASSWORD_CHARS.toString()
+                    .charAt(random.nextInt(SmartBankEliteConstants.PASSWORD_CHARS.toString().length())));
         }
+        log.info("Generated password: {}", password.toString());
         return password.toString();
     }
 

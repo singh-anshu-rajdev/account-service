@@ -55,7 +55,11 @@ public class JwtUtils  {
     }
 
     public CacheDTO getCacheDTOFromToken(HttpServletRequest httpServletRequest) {
-        Claims claims = extractAllClaims(httpServletRequest.getHeader(SmartBankEliteConstants.AUTHORIZATION.getValue()).substring(7));
+        return getCacheDTOFromToken(httpServletRequest.getHeader(SmartBankEliteConstants.AUTHORIZATION.getValue()).substring(7));
+    }
+
+    public CacheDTO getCacheDTOFromToken(String token) {
+        Claims claims = extractAllClaims(token);
         CacheDTO cacheDTO = new CacheDTO();
         cacheDTO.setUserId(claims.get(SmartBankEliteConstants.USER_ID.getValue(), Integer.class));
         cacheDTO.setUserName(claims.get(SmartBankEliteConstants.USERNAME.getValue(), String.class));

@@ -9,6 +9,8 @@ public enum SmartBankEliteConstants {
     USERNAME("username"),
     EMAIL_ID("emailId"),
     CREATED_AT("created At"),
+    PASSWORD_CHARS("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$!"),
+    USERNAME_CHARS("0123456789@#$!"),
     AUTHORIZATION("authorization");
 
     private final String value;
