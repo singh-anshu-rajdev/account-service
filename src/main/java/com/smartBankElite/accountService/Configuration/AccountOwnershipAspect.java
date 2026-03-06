@@ -2,10 +2,8 @@ package com.smartBankElite.accountService.Configuration;
 
 import com.smartBankElite.accountService.Annotation.VerifyAccountOwnership;
 import com.smartBankElite.accountService.DTO.CacheDTO;
-import com.smartBankElite.accountService.Model.AccountDetails;
 import com.smartBankElite.accountService.Repository.AccountDetailsRepository;
 import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.reflect.MethodSignature;
