@@ -15,6 +15,9 @@ public class AccountDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "account_number", unique = true, nullable = false)
+    private String accountNumber;
+
     // Personal Information
     @Column(name = "first_name", nullable = false)
     private String firstName;

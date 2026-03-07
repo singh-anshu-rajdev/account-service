@@ -9,14 +9,15 @@ import com.smartBankElite.accountService.Model.Address;
 import com.smartBankElite.accountService.Repository.AccountDetailsRepository;
 import com.smartBankElite.accountService.Service.AccountDetailsService;
 import com.smartBankElite.accountService.Utlis.GenericMapper;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
-import static com.smartBankElite.accountService.Utlis.CredentialGenerator.generatePassword;
-import static com.smartBankElite.accountService.Utlis.CredentialGenerator.generateUsername;
+import static com.smartBankElite.accountService.Utlis.CredentialGenerator.*;
 
 @Service
 public class AccountDetailsServiceImpl implements AccountDetailsService {
@@ -27,17 +28,20 @@ public class AccountDetailsServiceImpl implements AccountDetailsService {
     @Autowired
     private IAuthSeviceCalls iAuthSeviceCalls;
 
-    @Transactional()
+    @Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.READ_COMMITTED)
     @Override
     public CreateAccountResponseDTO createAccount(CreateAccountRequestDTO createAccountRequestDTO) {
 
         checkValidity(createAccountRequestDTO.getEmail(), createAccountRequestDTO.getMobileNumber(), createAccountRequestDTO.getUniqueId());
         try {
-            // Convert DTO to Entity using generic mapper
+
             AccountDetails account = GenericMapper.mapToTarget(createAccountRequestDTO, AccountDetails.class);
 
             Address address = GenericMapper.mapToTarget(createAccountRequestDTO.getAddressDTO(), Address.class);
             account.setAddress(address);
+
+            // set account number
+            account.setAccountNumber(generateAccountNumber());
 
             // Convert Entity back to Response DTO
             RegisterUserDto registerUser = new RegisterUserDto();
@@ -65,7 +69,5 @@ public class AccountDetailsServiceImpl implements AccountDetailsService {
         if (null!=uniqueId && accountDetailsRepository.existsByUniqueIdAndDeletedFlagFalse(uniqueId)) {
             throw new RuntimeException("Unique ID already exists");
         }
-        return;
-
     }
 }

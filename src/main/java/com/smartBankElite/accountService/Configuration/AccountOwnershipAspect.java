@@ -32,19 +32,19 @@ public class AccountOwnershipAspect {
     public void verifyAccountOwnership(JoinPoint joinPoint,
                                        VerifyAccountOwnership verifyAccountOwnership) throws Exception {
 
-        Long accountId = extractAccountId(joinPoint, verifyAccountOwnership.field());
+        String accountId = extractAccountId(joinPoint, verifyAccountOwnership.field());
         CacheDTO cacheDTO = jwtUtils.getCacheDTOFromToken(getToken());
         if (accountId == null || cacheDTO == null) {
             throw new RuntimeException("Account ID not found in request");
         }
         boolean exists = accountDetailsRepository
-                .existsByIdAndUserIdAndDeletedFlagFalse(accountId, cacheDTO.getUserId());
+                .existsByAccountNumberAndUserIdAndDeletedFlagFalse(accountId, cacheDTO.getUserId());
         if (!exists) {
             throw new RuntimeException("Unauthorized access to account");
         }
     }
 
-    private Long extractAccountId(JoinPoint joinPoint, String fieldName) throws Exception {
+    private String extractAccountId(JoinPoint joinPoint, String fieldName) throws Exception {
 
         Object[] args = joinPoint.getArgs();
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
@@ -57,13 +57,13 @@ public class AccountOwnershipAspect {
             if (arg == null) continue;
 
             // path variable
-            if (parameter.isAnnotationPresent(PathVariable.class) && arg instanceof Long) {
-                return (Long) arg;
+            if (parameter.isAnnotationPresent(PathVariable.class) && arg instanceof String) {
+                return  (String) arg;
             }
 
             // request param
-            if (parameter.isAnnotationPresent(RequestParam.class) && arg instanceof Long) {
-                return (Long) arg;
+            if (parameter.isAnnotationPresent(RequestParam.class) && arg instanceof String) {
+                return (String) arg;
             }
 
             // request body
@@ -71,8 +71,8 @@ public class AccountOwnershipAspect {
                 Field field = arg.getClass().getDeclaredField(fieldName);
                 field.setAccessible(true);
                 Object value = field.get(arg);
-                if (value instanceof Long) {
-                    return (Long) value;
+                if (value instanceof String) {
+                    return (String) value;
                 }
             } catch (NoSuchFieldException ignored) {
                 // If the field is not found in this parameter, continue to the next one

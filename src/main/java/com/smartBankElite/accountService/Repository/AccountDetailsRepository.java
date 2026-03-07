@@ -13,5 +13,5 @@ public interface AccountDetailsRepository extends JpaRepository<AccountDetails,L
 
     boolean existsByEmailAndDeletedFlagFalse(String emailId);
 
-    boolean existsByIdAndUserIdAndDeletedFlagFalse(Long accountId, Integer userId);
+    boolean existsByAccountNumberAndUserIdAndDeletedFlagFalse(String accountId, Integer userId);
 }

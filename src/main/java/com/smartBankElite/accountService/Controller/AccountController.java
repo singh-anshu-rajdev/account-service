@@ -23,7 +23,7 @@ public class AccountController {
 
     @GetMapping("/test")
     @VerifyAccountOwnership
-    public String test(@RequestParam(value = "accountId",required = false) Long accountId) {
+    public String test(@RequestParam(value = "accountId",required = false) String accountId) {
         return "Hello";
     }
 

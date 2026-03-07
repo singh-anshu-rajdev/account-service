@@ -26,9 +26,6 @@ public class CreateAccountRequestDTO {
     private String accountType;
     private Double initialDeposit;
 
-    // Security
-    private String password;
-
     // Consent
     private Boolean termsAccepted;
     private Boolean marketingConsent;
